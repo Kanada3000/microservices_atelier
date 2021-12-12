@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-identity
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 8082
+      nodePort: 31002
+  selector:
+    app: service-identity
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-identity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-identity
+  template:
+    metadata:
+      labels:
+        app: service-identity
+    spec:
+      containers:
+        - env:
+            - name: DB_SERVER
+              value: postgresqldb-atelier
+            - name: POSTGRES_DB
+              value: atelier
+            - name: POSTGRES_PASSWORD
+              value: "pass"
+            - name: POSTGRES_USER
+              value: postgres
+          image: kanada3000/service-identity
+          name: service-identity
+          ports:
+            - name: http
+              containerPort: 8082
+
+---

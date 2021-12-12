@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-claim
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 8084
+      nodePort: 31004
+  selector:
+    app: service-claim
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-claim
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-claim
+  template:
+    metadata:
+      labels:
+        app: service-claim
+    spec:
+      containers:
+        - env:
+            - name: DB_SERVER
+              value: postgresqldb-atelier
+            - name: POSTGRES_DB
+              value: atelier
+            - name: POSTGRES_PASSWORD
+              value: "pass"
+            - name: POSTGRES_USER
+              value: postgres
+          image: kanada3000/service-claim
+          name: service-claim
+          ports:
+            - name: http
+              containerPort: 8084
+
+---

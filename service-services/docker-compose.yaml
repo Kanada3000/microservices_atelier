@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-services
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 8083
+      nodePort: 31003
+  selector:
+    app: service-services
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-services
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: service-services
+  template:
+    metadata:
+      labels:
+        app: service-services
+    spec:
+      containers:
+        - env:
+            - name: DB_SERVER
+              value: postgresqldb-atelier
+            - name: POSTGRES_DB
+              value: atelier
+            - name: POSTGRES_PASSWORD
+              value: "pass"
+            - name: POSTGRES_USER
+              value: postgres
+          image: kanada3000/service-services
+          name: service-services
+          ports:
+            - name: http
+              containerPort: 8083
+
+---
